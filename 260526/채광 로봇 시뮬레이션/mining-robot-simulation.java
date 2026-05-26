@@ -8,22 +8,22 @@ public class Main {
     static final int MIN_VALUE = -1000000000;
 
     static int n, t;
-    static int[][] a = new int[MAX_N][MAX_N];
-    static int[][] mx = new int[MAX_N][MAX_N];
+    static int[][] board = new int[MAX_N][MAX_N];
+    static int[][] tMax = new int[MAX_N][MAX_N];
     static int[][][] dp = new int[MAX_N][MAX_N][2];
 
     static void calculateMaxProfit(int i, int j, int x, int y, int passedTime, int profit) {
         if (passedTime == t) {
-            mx[i][j] = Math.max(mx[i][j], profit);
+            tMax[i][j] = Math.max(tMax[i][j], profit);
             return;
         }
 
         if (x + 1 <= n) {
-            calculateMaxProfit(i, j, x + 1, y, passedTime + 1, profit + a[x + 1][y]);
+            calculateMaxProfit(i, j, x + 1, y, passedTime + 1, profit + board[x + 1][y]);
         }
 
         if (y + 1 <= n) {
-            calculateMaxProfit(i, j, x, y + 1, passedTime + 1, profit + a[x][y + 1]);
+            calculateMaxProfit(i, j, x, y + 1, passedTime + 1, profit + board[x][y + 1]);
         }
     }
 
@@ -39,13 +39,13 @@ public class Main {
             st = new StringTokenizer(br.readLine());
 
             for (int j = 1; j <= n; j++) {
-                a[i][j] = Integer.parseInt(st.nextToken());
+                board[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j <= n; j++) {
-                mx[i][j] = MIN_VALUE;
+                tMax[i][j] = MIN_VALUE;
                 dp[i][j][0] = MIN_VALUE;
                 dp[i][j][1] = MIN_VALUE;
             }
@@ -53,25 +53,25 @@ public class Main {
 
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j <= n; j++) {
-                calculateMaxProfit(i, j, i, j, 0, a[i][j]);
+                calculateMaxProfit(i, j, i, j, 0, board[i][j]);
             }
         }
 
-        dp[1][1][0] = a[1][1];
+        dp[1][1][0] = board[1][1];
 
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j <= n; j++) {
 
-                dp[i][j][1] = Math.max(dp[i][j][1], dp[i][j][0] + mx[i][j]);
+                dp[i][j][1] = Math.max(dp[i][j][1], dp[i][j][0] + tMax[i][j]);
 
                 if (i + 1 <= n) {
-                    dp[i + 1][j][0] = Math.max(dp[i + 1][j][0], dp[i][j][0] + a[i + 1][j]);
-                    dp[i + 1][j][1] = Math.max(dp[i + 1][j][1], dp[i][j][1] + a[i + 1][j]);
+                    dp[i + 1][j][0] = Math.max(dp[i + 1][j][0], dp[i][j][0] + board[i + 1][j]);
+                    dp[i + 1][j][1] = Math.max(dp[i + 1][j][1], dp[i][j][1] + board[i + 1][j]);
                 }
 
                 if (j + 1 <= n) {
-                    dp[i][j + 1][0] = Math.max(dp[i][j + 1][0], dp[i][j][0] + a[i][j + 1]);
-                    dp[i][j + 1][1] = Math.max(dp[i][j + 1][1], dp[i][j][1] + a[i][j + 1]);
+                    dp[i][j + 1][0] = Math.max(dp[i][j + 1][0], dp[i][j][0] + board[i][j + 1]);
+                    dp[i][j + 1][1] = Math.max(dp[i][j + 1][1], dp[i][j][1] + board[i][j + 1]);
                 }
             }
         }

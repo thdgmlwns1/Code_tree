@@ -4,26 +4,27 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-    static final int MAX_N = 1005;
     static final int MIN_VALUE = -1000000000;
 
     static int n, t;
-    static int[][] board = new int[MAX_N][MAX_N];
-    static int[][] tMax = new int[MAX_N][MAX_N];
-    static int[][][] dp = new int[MAX_N][MAX_N][2];
+    static int[][] board;
+    static int[][] tMax;
+    static int[][][] dp;
 
-    static void calculateMaxProfit(int i, int j, int x, int y, int passedTime, int profit) {
+    static void calculateMaxProfit(int startX, int startY, int x, int y, int passedTime, int profit) {
         if (passedTime == t) {
-            tMax[i][j] = Math.max(tMax[i][j], profit);
+            tMax[startX][startY] = Math.max(tMax[startX][startY], profit);
             return;
         }
 
-        if (x + 1 <= n) {
-            calculateMaxProfit(i, j, x + 1, y, passedTime + 1, profit + board[x + 1][y]);
+        // 아래로 이동
+        if (x + 1 < n) {
+            calculateMaxProfit(startX, startY, x + 1, y, passedTime + 1, profit + board[x + 1][y]);
         }
 
-        if (y + 1 <= n) {
-            calculateMaxProfit(i, j, x, y + 1, passedTime + 1, profit + board[x][y + 1]);
+        // 오른쪽으로 이동
+        if (y + 1 < n) {
+            calculateMaxProfit(startX, startY, x, y + 1, passedTime + 1, profit + board[x][y + 1]);
         }
     }
 
@@ -35,47 +36,60 @@ public class Main {
         n = Integer.parseInt(st.nextToken());
         t = Integer.parseInt(st.nextToken());
 
-        for (int i = 1; i <= n; i++) {
+        board = new int[n][n];
+        tMax = new int[n][n];
+        dp = new int[n][n][2];
+
+        for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
 
-            for (int j = 1; j <= n; j++) {
+            for (int j = 0; j < n; j++) {
                 board[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
+        // 초기화
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 tMax[i][j] = MIN_VALUE;
                 dp[i][j][0] = MIN_VALUE;
                 dp[i][j][1] = MIN_VALUE;
             }
         }
 
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
+        // 각 칸에서 시간 역행을 썼을 때 얻을 수 있는 최대 수익 계산
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 calculateMaxProfit(i, j, i, j, 0, board[i][j]);
             }
         }
 
-        dp[1][1][0] = board[1][1];
 
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
+        dp[0][0][0] = board[0][0];
 
+        // DP 진행
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+
+                // 현재 위치에서 시간 역행 사용
                 dp[i][j][1] = Math.max(dp[i][j][1], dp[i][j][0] + tMax[i][j]);
 
-                if (i + 1 <= n) {
+                // 아래로 이동
+                if (i + 1 < n) {
                     dp[i + 1][j][0] = Math.max(dp[i + 1][j][0], dp[i][j][0] + board[i + 1][j]);
+
                     dp[i + 1][j][1] = Math.max(dp[i + 1][j][1], dp[i][j][1] + board[i + 1][j]);
                 }
 
-                if (j + 1 <= n) {
+                // 오른쪽으로 이동
+                if (j + 1 < n) {
                     dp[i][j + 1][0] = Math.max(dp[i][j + 1][0], dp[i][j][0] + board[i][j + 1]);
+
                     dp[i][j + 1][1] = Math.max(dp[i][j + 1][1], dp[i][j][1] + board[i][j + 1]);
                 }
             }
         }
 
-        System.out.println(Math.max(dp[n][n][0], dp[n][n][1]));
+        System.out.println(Math.max(dp[n - 1][n - 1][0], dp[n - 1][n - 1][1]));
     }
 }
